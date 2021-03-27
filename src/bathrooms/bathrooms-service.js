@@ -1,22 +1,46 @@
 const xss = require('xss')
 
 const BathroomsService = {
-    getAllBathrooms(knex) {
-        //return knex
-            // .select('*')
-            // .from('bathrooms')
-        return knex.raw(
-            `select row_to_json(br) as bathrooms
-            from(
-              select br.id, br.br_name, br.lat, br.lng, br.description, br.category, br.user_id,
-              (select json_agg(t)
-              from (
-                select * from tags where bathroom_id = br.id
-              ) t
-            ) as tags
-            from bathrooms as br) br;`
-        )
-            
+    getAllBathrooms(db) {
+        return db
+        .from('bathrooms')
+        .select('*')
+        // return db
+        //     .from('bathrooms AS bath')
+        //     .select('*',
+        //  // ADDS NUMBER OF COMMENTS
+        //   db.raw(
+        //     `count(DISTINCT fav) AS number_of_favorites`
+        //   ),
+        // )
+        //   //ADDS AUTHOR INFO
+        //   db.raw(
+        //     `json_strip_nulls(
+        //       json_build_object(
+        //         'id', usr.id,
+        //         'user_name', usr.user_name,
+        //         'full_name', usr.full_name,
+        //         'nickname', usr.nickname,
+        //         'date_created', usr.date_created,
+        //         'date_modified', usr.date_modified
+        //       )
+        //     ) AS "author"`
+        //   ),
+         //)
+        //adds the info to the articles table
+        
+        //  .leftJoin(
+        //   'favorites AS fav',
+        //   'bath.id',
+        //   'fav.bathroom_id',
+        // )
+        // .leftJoin(
+        //   'blogful_users AS usr',
+        //   'art.author_id',
+        //   'usr.id',
+        // )
+        // .groupBy('bath.id', 'bath.br_name', 'bath.lat', 'bath.lng', 'bath.description', 'bath.user_id', 'bath.category', 'bath.ishandicap', 'bath.isfamily', 'bath.hasstalls', 'bath.isprivate', 'bath.gender_neutral', 'bath.hasbaby_table', 'fav.id', 'fav.bathroom_id', 'fav.user_id')
+        
     },
     
        insertBathroom(db, newBathroom) {
@@ -35,17 +59,50 @@ const BathroomsService = {
             .where('id', id)
             .first()
          },
-         
+
+         //need to make sure this requires auth of the person who created the bathroom
      deleteBathroom(knex, id) {
                return knex('bathrooms')
                  .where({ id })
                  .delete()
      },
-        updateBathroom(knex, id, newBathroomFields) {
-               return knex('bathrooms')
-                 .where({ id })
-                 .update(newBathroomFields)
-             },
+
+     getCommentsForBathroom(db, bathroom_id) {
+        return db
+          .from('comments AS comm')
+          .select(
+            'comm.id',
+            'comm.text',
+            'comm.date_commented',
+            db.raw(
+              `json_strip_nulls(
+                row_to_json(
+                  (SELECT tmp FROM (
+                    SELECT
+                      usr.id,
+                      usr.username,
+                      usr.fname,
+                      usr.lname,
+                      usr.date_created
+                  ) tmp)
+                )
+              ) AS "user"`
+            )
+          )
+          .where('comm.bathroom_id', bathroom_id)
+          .leftJoin(
+            'users AS usr',
+            'comm.user_id',
+            'usr.id',
+          )
+          .groupBy('comm.id', 'usr.id')
+      },
+        // update only possible by administration, too messy to give users ability to update themselves
+        // updateBathroom(knex, id, newBathroomFields) {
+        //        return knex('bathrooms')
+        //          .where({ id })
+        //          .update(newBathroomFields)
+        //      },
     
 
     serializeBathroom(bathroom) {
@@ -56,9 +113,15 @@ const BathroomsService = {
             lat: bathroom.lat,
             lng: bathroom.lng,
             description: xss(bathroom.description),
-            creator: bathroom.user_id,
+            user_id: bathroom.user_id,
             category: bathroom.category,
-            // number_of_favorites: Number(bathroom.number_of_favorites) || 0,
+            ishandicap: bathroom.ishandicap,
+            isfamily: bathroom.isfamily,
+            hasstalls: bathroom.hasstalls,
+            isprivate: bathroom.isprivate,
+            gender_neutral: bathroom.gender_neutral,
+            hasbaby_table: bathroom.hasbaby_table,
+            //number_of_favorites: Number(bathroom.number_of_favorites) || 0,
             // rates: {
             //     id: rates.id,
             //     bathroom_id: rates.bathroom_id,
@@ -70,6 +133,23 @@ const BathroomsService = {
             //     id: tags.id,
             //     tag: tags.tag
             // },
+        }
+    },
+
+serializeComment(comment) {
+        const { user } = comment
+        return {
+            id: comment.id,
+            bathroom_id: comment.bathroom_id,
+            text: xss(comment.text),
+            date_commented: new Date(comment.date_commented),
+            user: {
+                id: user.id,
+                username: user.username,
+                fname: user.fname,
+                lname: user.lname,
+                date_created: new Date(user.date_created),
+            },
         }
     },
 }

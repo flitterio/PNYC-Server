@@ -19,7 +19,6 @@ const CommentsService = {
                   usr.fname,
                   usr.lname,
                   usr.date_created,
-                  usr.date_modified
               ) tmp)
             )
           ) AS "user"`
@@ -50,15 +49,14 @@ const CommentsService = {
     return {
       id: comment.id,
       text: xss(comment.text),
-      article_id: comment.article_id,
+      bathroom_id: comment.bathroom_id,
       date_created: new Date(comment.date_created),
       user: {
         id: user.id,
-        username: user.user_name,
-        fname: user.full_name,
-        lname: user.nickname,
+        username: user.username,
+        fname: user.fname,
+        lname: user.lname,
         date_created: new Date(user.date_created),
-        date_modified: new Date(user.date_modified) || null
       },
     }
   }

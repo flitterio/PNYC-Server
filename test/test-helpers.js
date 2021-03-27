@@ -117,73 +117,73 @@ function makeFavoritesArray(){[
     }
 ]}
 
-function makeTagsArray(){[
+// function makeTagsArray(){[
+//     {
+//         id: 1,
+//         bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
+//         tag:'Handicap'
+//     },
+//     {
+//         id: 2,
+//         bathroom_id: 'faijsdfilok',
+//         tag:'Family'
+//     }
+
+// ]}
+
+function makeCommentsArray(users, bathrooms) {
+  return [
     {
-        id: 1,
-        bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
-        tag:'Handicap'
+      id: 1,
+      text: 'First test comment!',
+      bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
+      user_id: users[0].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
     },
     {
-        id: 2,
-        bathroom_id: 'faijsdfilok',
-        tag:'Family'
-    }
-
-]}
-
-// function makeCommentsArray(users, bathrooms) {
-//   return [
-//     {
-//       id: 1,
-//       text: 'First test comment!',
-//       bathroom_id: ,
-//       user_id: users[0].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//     {
-//       id: 2,
-//       text: 'Second test comment!',
-//       bathroom_id: bathrooms[0].id,
-//       user_id: users[1].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//     {
-//       id: 3,
-//       text: 'Third test comment!',
-//       bathroom_id: bathrooms[0].id,
-//       user_id: users[2].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//     {
-//       id: 4,
-//       text: 'Fourth test comment!',
-//       bathroom_id: bathrooms[0].id,
-//       user_id: users[3].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//     {
-//       id: 5,
-//       text: 'Fifth test comment!',
-//       bathroom_id: bathrooms[bathrooms.length - 1].id,
-//       user_id: users[0].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//     {
-//       id: 6,
-//       text: 'Sixth test comment!',
-//       bathroom_id: bathrooms[bathrooms.length - 1].id,
-//       user_id: users[2].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//     {
-//       id: 7,
-//       text: 'Seventh test comment!',
-//       bathroom_id: bathrooms[3].id,
-//       user_id: users[0].id,
-//       date_created: new Date('2029-01-22T16:28:32.615Z'),
-//     },
-//   ];
-// }
+      id: 2,
+      text: 'Second test comment!',
+      bathroom_id: 'faijsdfilok',
+      user_id: users[1].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
+    },
+    {
+      id: 3,
+      text: 'Third test comment!',
+      bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
+      user_id: users[2].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
+    },
+    {
+      id: 4,
+      text: 'Fourth test comment!',
+      bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
+      user_id: users[3].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
+    },
+    {
+      id: 5,
+      text: 'Fifth test comment!',
+      bathroom_id: 'faijsdfilok',
+      user_id: users[0].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
+    },
+    {
+      id: 6,
+      text: 'Sixth test comment!',
+      bathroom_id: 'faijsdfilok',
+      user_id: users[2].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
+    },
+    {
+      id: 7,
+      text: 'Seventh test comment!',
+      bathroom_id: 'faijsdfilok',
+      user_id: users[0].id,
+      date_created: new Date('2029-01-22T16:28:32.615Z'),
+    },
+  ];
+}
 
 // function makeExpectedBathroom(users, bathroom, comments=[]) {
 //   const author = users

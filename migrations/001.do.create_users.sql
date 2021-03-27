@@ -11,12 +11,12 @@ CREATE TABLE users (
     username TEXT NOT NULL,
     password VARCHAR NOT NULL,
     date_created TIMESTAMPTZ DEFAULT now() NOT NULL,
-    isHandicap BOOLEAN DEFAULT false,
-    isFamily BOOLEAN DEFAULT false,
-    hasStalls BOOLEAN DEFAULT false,
-    isPrivate BOOLEAN DEFAULT false,
+    ishandicap BOOLEAN DEFAULT false,
+    isfamily BOOLEAN DEFAULT false,
+    hasstalls BOOLEAN DEFAULT false,
+    isprivate BOOLEAN DEFAULT false,
     gender_neutral BOOLEAN DEFAULT false,
-    hasBaby_table BOOLEAN DEFAULT false,
+    hasbaby_table BOOLEAN DEFAULT false,
 
 );
 

@@ -1,8 +1,8 @@
 const path = require('path')
 const express = require('express')
-const xss = require('xss')
+// const xss = require('xss')
 const BathroomsService = require('./bathrooms-service')
-//const RatesService = require('../rates/rates-service')
+const RatesService = require('../rates/rates-service')
 const bathroomsRouter = express.Router()
 const jsonParser = express.json()
 
@@ -29,8 +29,7 @@ bathroomsRouter
        
         //can add information to the bathrooms array, then return final array with response
         .then(bathrooms => {
-            console.log('bathrooms', bathrooms)
-            res.json(bathrooms.Results.rows.map(BathroomsService.serializeBathroom))
+            res.json(bathrooms.map(BathroomsService.serializeBathroom))
         })
         .catch(next)
   })
@@ -46,8 +45,8 @@ bathroomsRouter
 //   })
 
 .post(jsonParser, (req, res, next) => {
-    const{id, br_name, lat, lng, user_id, category, description='Bathroom' } = req.body
-    const newBathroom = { id, br_name, lat, lng, user_id, category}
+    const{id, br_name, lat, lng, user_id, category, description='Bathroom', ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table} = req.body
+    let newBathroom = { id, br_name, lat, lng, user_id, category}
 
     for(const [key, value] of Object.entries(newBathroom)) {
         if (value == null) {
@@ -57,7 +56,7 @@ bathroomsRouter
         }
     }
 
-    newBathroom.description = description 
+    newBathroom = { ...newBathroom, description,ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table } 
     BathroomsService.insertBathroom(
         req.app.get('db'),
         newBathroom
@@ -67,7 +66,7 @@ bathroomsRouter
             res 
                 .status(201)
                 .location(path.posix.join(req.originalUrl + `/${bathroom.id}`))
-                .json(serializeBathroom(bathroom))
+                .json(BathroomsService.serializeBathroom(bathroom))
         })
         .catch(next)
     })
@@ -93,37 +92,86 @@ bathroomsRouter
     .get((req, res, next) => {
         res.json(BathroomsService.serializeBathroom(res.bathroom))
     })
-    // .delete((req, res, next) => {
-    //     BathroomsService.deleteBathroom(
-    //         req.app.get('db'),
-    //         req.params.bathroom_id
-    //     )
-    //     .then(numRowsAffected => {
-    //         res.status(204).end()
-    //     })
-    //     .catch(next)
-    // })
-    .patch(jsonParser, (req, res, next) => {
-        const { br_name, description} = req.body
-        const bathroomToUpdate = { br_name, description }
-
-        const numberOfValues = Object.values(bathroomToUpdate).filter(Boolean).length
-        if(numberOfValues === 0) {
-            return res.status(400).json({
-                error: {
-                    message: `Request body must contain either 'name' or 'description'`
-                }
-            })
-        }
-        BathroomsService.updateBathroom(
+    //WILL NEED TO REQUIRE AUTH
+    .delete((req, res, next) => {
+        BathroomsService.deleteBathroom(
             req.app.get('db'),
-            req.params.bathroom_id,
-            bathroomToUpdate
+            req.params.bathroom_id
         )
         .then(numRowsAffected => {
             res.status(204).end()
         })
         .catch(next)
     })
+    // .patch(jsonParser, (req, res, next) => {
+    //     const { br_name, description} = req.body
+    //     const bathroomToUpdate = { br_name, description }
+
+    //     const numberOfValues = Object.values(bathroomToUpdate).filter(Boolean).length
+    //     if(numberOfValues === 0) {
+    //         return res.status(400).json({
+    //             error: {
+    //                 message: `Request body must contain either 'name' or 'description'`
+    //             }
+    //         })
+    //     }
+    //     BathroomsService.updateBathroom(
+    //         req.app.get('db'),
+    //         req.params.bathroom_id,
+    //         bathroomToUpdate
+    //     )
+    //     .then(numRowsAffected => {
+    //         res.status(204).end()
+    //     })
+    //     .catch(next)
+    // })
+bathroomsRouter
+    .route('/:bathroom_id/rates')
+    .all(checkBathroomExists)
+    .get((req, res, next) => {
+        RatesService.getByBrId(
+            req.app.get('db'),
+            req.params.bathroom_id
+        )
+        .then(rates => {
+            res.json(rates.map(RatesService.serializeRate))
+        })
+        .catch(next)
+    })
+
+bathroomsRouter
+    .route('/:bathroom_id/comments/')
+    //.all(requireAuth)
+    .all(checkBathroomExists)
+    .get((req, res, next) => {
+        BathroomsService.getCommentsForBathroom(
+        req.app.get('db'),
+        req.params.bathroom_id
+        )
+        .then(comments => {
+            console.log('comments', comments)
+            res.json(comments.map(BathroomsService.serializeComment))
+        })
+        .catch(next)
+    })
+
+async function checkBathroomExists(req, res, next) {
+    try {
+        const bathroom = await BathroomsService.getById(
+        req.app.get('db'),
+        req.params.bathroom_id
+        )
+    
+        if (!bathroom)
+        return res.status(404).json({
+            error: `Bathroom doesn't exist`
+        })
+    
+        res.bathroom = bathroom
+        next()
+    } catch (error) {
+        next(error)
+    }
+    }
 
   module.exports = bathroomsRouter

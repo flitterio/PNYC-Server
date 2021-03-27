@@ -5,7 +5,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const bathroomsRouter = require('./bathrooms/bathrooms-router')
-const tagsRouter = require('./tags/tags-router')
+//const tagsRouter = require('./tags/tags-router')
 const commentsRouter = require('./comments/comments-router')
 const favoritesRouter = require('./favorites/favorites-router')
 const ratesRouter = require('./rates/rates-router')
@@ -27,7 +27,7 @@ app.use('/api/bathrooms', bathroomsRouter) //
 //app.use('/api/tags', tagsRouter)
 app.use('/api/comments', commentsRouter)
 app.use('/api/favorites', favoritesRouter)
-//app.use('/api/rates', ratesRouter)
+app.use('/api/rates', ratesRouter)
 
 
 app.get('/', (req, res) => {

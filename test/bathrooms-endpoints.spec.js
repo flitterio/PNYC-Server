@@ -173,6 +173,12 @@ describe('Bathrooms Endpoints', function() {
               expect(res.body.user_id).to.eql(newBathroom.user_id)
               expect(res.body.category).to.eql(newBathroom.category)
               expect(res.body).to.have.property('id')
+              expect(res.body).to.have.property('ishandicap')
+              expect(res.body).to.have.property('isfamily')
+              expect(res.body).to.have.property('hasstalls')
+              expect(res.body).to.have.property('isprivate')
+              expect(res.body).to.have.property('gender_neutral')
+              expect(res.body).to.have.property('hasbaby_table')
               expect(res.headers.location).to.eql(`/api/bathrooms/${res.body.id}`)
             //   const expected = new Intl.DateTimeFormat('en-US').format(new Date())
             //   const actual = new Intl.DateTimeFormat('en-US').format(new Date(res.body.date_published))
@@ -263,87 +269,87 @@ describe('Bathrooms Endpoints', function() {
         })
       })
     
-    describe(`PATCH /api/bathrooms/:bathroom_id`, () => {
-        context(`Given no bathrooms`, () => {
-          it(`responds with 404`, () => {
-            const bathroomId = 123456
-            return supertest(app)
-              .delete(`/api/bathrooms/${bathroomId}`)
-              .expect(404, { error: { message: `Bathroom doesn't exist` } })
-          })
-        })
+    // describe(`PATCH /api/bathrooms/:bathroom_id`, () => {
+    //     context(`Given no bathrooms`, () => {
+    //       it(`responds with 404`, () => {
+    //         const bathroomId = 123456
+    //         return supertest(app)
+    //           .delete(`/api/bathrooms/${bathroomId}`)
+    //           .expect(404, { error: { message: `Bathroom doesn't exist` } })
+    //       })
+    //     })
     
-        context('Given there are bathrooms in the database', () => {
-          const testUsers = makeUsersArray();
-          const testBathrooms = makeBathroomsArray()
+    //     context('Given there are bathrooms in the database', () => {
+    //       const testUsers = makeUsersArray();
+    //       const testBathrooms = makeBathroomsArray()
     
-          beforeEach('insert bathrooms', () => {
-            return db
-              .into('users')
-              .insert(testUsers)
-              .then(() => {
-                return db
-                  .into('bathrooms')
-                  .insert(testBathrooms)
-              })
-          })
+    //       beforeEach('insert bathrooms', () => {
+    //         return db
+    //           .into('users')
+    //           .insert(testUsers)
+    //           .then(() => {
+    //             return db
+    //               .into('bathrooms')
+    //               .insert(testBathrooms)
+    //           })
+    //       })
     
-          it('responds with 204 and updates the bathroom', () => {
-            const idToUpdate = 'faijsdfilok'
-            const updateBathroom = {
-              br_name: 'updated bathroom name',
-              description: 'updated bathroom description',
-            }
-            const expectedBathroom = {
-              ...testBathrooms[1],
-              ...updateBathroom
-            }
-            return supertest(app)
-              .patch(`/api/bathrooms/${idToUpdate}`)
-              .send(updateBathroom)
-              .expect(204)
-              .then(res =>
-                supertest(app)
-                  .get(`/api/bathrooms/${idToUpdate}`)
-                  .expect(expectedBathroom)
-              )
-          })
+    //       it('responds with 204 and updates the bathroom', () => {
+    //         const idToUpdate = 'faijsdfilok'
+    //         const updateBathroom = {
+    //           br_name: 'updated bathroom name',
+    //           description: 'updated bathroom description',
+    //         }
+    //         const expectedBathroom = {
+    //           ...testBathrooms[1],
+    //           ...updateBathroom
+    //         }
+    //         return supertest(app)
+    //           .patch(`/api/bathrooms/${idToUpdate}`)
+    //           .send(updateBathroom)
+    //           .expect(204)
+    //           .then(res =>
+    //             supertest(app)
+    //               .get(`/api/bathrooms/${idToUpdate}`)
+    //               .expect(expectedBathroom)
+    //           )
+    //       })
     
-          it(`responds with 400 when no required fields supplied`, () => {
-            const idToUpdate = 'faijsdfilok'
-            return supertest(app)
-              .patch(`/api/bathrooms/${idToUpdate}`)
-              .send({ irrelevantField: 'foo' })
-              .expect(400, {
-                error: {
-                  message: `Request body must contain either 'name' or 'description'`
-                }
-              })
-          })
+    //       it(`responds with 400 when no required fields supplied`, () => {
+    //         const idToUpdate = 'faijsdfilok'
+    //         return supertest(app)
+    //           .patch(`/api/bathrooms/${idToUpdate}`)
+    //           .send({ irrelevantField: 'foo' })
+    //           .expect(400, {
+    //             error: {
+    //               message: `Request body must contain either 'name' or 'description'`
+    //             }
+    //           })
+    //       })
     
-          it(`responds with 204 when updating only a subset of fields`, () => {
-            const idToUpdate = 'faijsdfilok'
-            const updateBathroom = {
-              br_name: 'updated bathroom name',
-            }
-            const expectedBathroom = {
-              ...testBathrooms[1],
-              ...updateBathroom
-            }
+    //       it(`responds with 204 when updating only a subset of fields`, () => {
+    //         const idToUpdate = 'faijsdfilok'
+    //         const updateBathroom = {
+    //           br_name: 'updated bathroom name',
+    //         }
+    //         const expectedBathroom = {
+    //           ...testBathrooms[1],
+    //           ...updateBathroom
+    //         }
     
-            return supertest(app)
-              .patch(`/api/bathrooms/${idToUpdate}`)
-              .send({
-                ...updateBathroom,
-                fieldToIgnore: 'should not be in GET response'
-              })
-              .expect(204)
-              .then(res =>
-                supertest(app)
-                  .get(`/api/bathrooms/${idToUpdate}`)
-                  .expect(expectedBathroom)
-              )
-          })
-        })
-      })
+    //         return supertest(app)
+    //           .patch(`/api/bathrooms/${idToUpdate}`)
+    //           .send({
+    //             ...updateBathroom,
+    //             fieldToIgnore: 'should not be in GET response'
+    //           })
+    //           .expect(204)
+    //           .then(res =>
+    //             supertest(app)
+    //               .get(`/api/bathrooms/${idToUpdate}`)
+    //               .expect(expectedBathroom)
+    //           )
+    //       })
+    //     })
+    //   })
 })
