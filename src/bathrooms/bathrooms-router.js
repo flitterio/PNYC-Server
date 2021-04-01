@@ -3,8 +3,11 @@ const express = require('express')
 // const xss = require('xss')
 const BathroomsService = require('./bathrooms-service')
 const RatesService = require('../rates/rates-service')
+const FavoritesService = require('../favorites/favorites-service')
 const bathroomsRouter = express.Router()
 const jsonParser = express.json()
+const { requireAuth } = require('../middleware/jwt-auth')
+const { response } = require('../app')
 
 // const serializeBathroom = bathroom => ({
 //     id: bathroom.id,
@@ -44,7 +47,7 @@ bathroomsRouter
 //     .catch(next)
 //   })
 
-.post(jsonParser, (req, res, next) => {
+.post(requireAuth, jsonParser, (req, res, next) => {
     const{id, br_name, lat, lng, user_id, category, description='Bathroom', ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table} = req.body
     let newBathroom = { id, br_name, lat, lng, user_id, category}
 
@@ -74,6 +77,7 @@ bathroomsRouter
 bathroomsRouter
     .route('/:bathroom_id')
     .all((req, res, next) => {
+        let bathroomInfo = {}
         BathroomsService.getById(
             req.app.get('db'),
             req.params.bathroom_id
@@ -84,16 +88,62 @@ bathroomsRouter
                     error: { message: `Bathroom doesn't exist` }
                 })
             }
-            res.bathroom = bathroom 
-            next()
-        })
+            bathroomInfo = bathroom
+           // res.bathroom = bathroom 
+            // next()
+            RatesService.getByBrId(
+                req.app.get('db'),
+                req.params.bathroom_id
+            )
+            .then(rates => {
+                // const ratesArr = rates.map(RatesService.serializeRate)
+                let ratings = rates.map(r => r.rating)
+                console.log('rates', ratings)
+                const reducer = (accumulator, currentValue) => accumulator + currentValue;
+                if(ratings.length !== 0){
+                const rating = (ratings.reduce(reducer)) / ratings.length 
+                
+                // res.json(rates.map(RatesService.serializeRate))
+                console.log('post function', rating)
+                bathroomInfo['rate'] = rating }
+                else{
+                    bathroomInfo['rate'] = 0
+                }
+                res.bathroom = bathroomInfo
+                // next()
+            })
+            .catch(next)
+            
+            FavoritesService.getBathroomFavorites(
+                req.app.get('db'),
+                req.params.bathroom_id
+                )  
+            .then(favorites => {
+               let faveLength = favorites.length
+                bathroomInfo['favorites'] = faveLength
+                res.bathroom = bathroomInfo
+                next()
+            })
+            .catch(next)
+
+        //     BathroomsService.getCommentsForBathroom(
+        //         req.app.get('db'),
+        //         req.params.bathroom_id
+        //         )
+        //         .then(comments => {
+        //             res.json(comments.map(BathroomsService.serializeComment))
+        //             next()
+        //         })
+        //         .catch(next)
+         })
         .catch(next)
     })
+    
     .get((req, res, next) => {
         res.json(BathroomsService.serializeBathroom(res.bathroom))
     })
-    //WILL NEED TO REQUIRE AUTH
-    .delete((req, res, next) => {
+    //where should I check if user ID === current logged in user id?
+    .delete(requireAuth, (req, res, next) => {
         BathroomsService.deleteBathroom(
             req.app.get('db'),
             req.params.bathroom_id
@@ -140,7 +190,7 @@ bathroomsRouter
     })
 
 bathroomsRouter
-    .route('/:bathroom_id/comments/')
+    .route('/:bathroom_id/comments')
     //.all(requireAuth)
     .all(checkBathroomExists)
     .get((req, res, next) => {
@@ -173,5 +223,16 @@ async function checkBathroomExists(req, res, next) {
         next(error)
     }
     }
+
+    bathroomsRouter
+          .route('/:bathroom_id/favorites')
+          .get((req, res, next ) => {
+              const knexInstance = req.app.get('db')
+              FavoritesService.getBathroomFavorites(knexInstance, req.params.bathroom_id)  
+              .then(favorites => {
+                  res.json(favorites.map(FavoritesService.serializeFavorite))
+              })
+              .catch(next)
+          })
 
   module.exports = bathroomsRouter

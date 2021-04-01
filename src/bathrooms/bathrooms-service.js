@@ -1,4 +1,5 @@
 const xss = require('xss')
+const RatesService = require('../rates/rates-service')
 
 const BathroomsService = {
     getAllBathrooms(db) {
@@ -104,14 +105,35 @@ const BathroomsService = {
         //          .update(newBathroomFields)
         //      },
     
+    //   bathroomRate(bathroom_id) {
+    //     RatesService.getByBrId(
+    //         req.app.get('db'),
+    //         bathroom_id
+    //     )
+    //     .then(rates => {
+    //         // const ratesArr = rates.map(RatesService.serializeRate)
+    //         let ratings = rates.map(r => r.rating)
+    //         console.log('rates', ratings)
+    //         const reducer = (accumulator, currentValue) => accumulator + currentValue;
+    //         const rating = (ratings.reduce(reducer)) / ratings.length
+            
+            // res.json(rates.map(RatesService.serializeRate))
+            // console.log('post function', rating)
+            // bathroomInfo['rate'] = rating
+            // res.bathroom = bathroomInfo
+            // next()
+    //         return rating
+    //     })
+    //     // .catch(next)
+    //   },
 
     serializeBathroom(bathroom) {
         // const tags = this.getTags( bathroom.id)
         return{
             id: bathroom.id,
             br_name: xss(bathroom.br_name),
-            lat: bathroom.lat,
-            lng: bathroom.lng,
+            lat: parseFloat(bathroom.lat),
+            lng: parseFloat(bathroom.lng),
             description: xss(bathroom.description),
             user_id: bathroom.user_id,
             category: bathroom.category,
@@ -121,6 +143,8 @@ const BathroomsService = {
             isprivate: bathroom.isprivate,
             gender_neutral: bathroom.gender_neutral,
             hasbaby_table: bathroom.hasbaby_table,
+            rate: bathroom.rate,
+            favorites: bathroom.favorites,
             //number_of_favorites: Number(bathroom.number_of_favorites) || 0,
             // rates: {
             //     id: rates.id,

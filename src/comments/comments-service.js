@@ -7,7 +7,7 @@ const CommentsService = {
       .select(
         'comm.id',
         'comm.text',
-        'comm.date_created',
+        'comm.date_commented',
         'comm.bathroom_id',
         db.raw(
           `json_strip_nulls(
@@ -18,7 +18,7 @@ const CommentsService = {
                   usr.username,
                   usr.fname,
                   usr.lname,
-                  usr.date_created,
+                  usr.date_created
               ) tmp)
             )
           ) AS "user"`
@@ -50,7 +50,7 @@ const CommentsService = {
       id: comment.id,
       text: xss(comment.text),
       bathroom_id: comment.bathroom_id,
-      date_created: new Date(comment.date_created),
+      date_commented: new Date(comment.date_commented),
       user: {
         id: user.id,
         username: user.username,

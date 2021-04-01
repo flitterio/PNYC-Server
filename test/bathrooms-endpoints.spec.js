@@ -3,7 +3,10 @@ const supertest = require('supertest')
 const app = require('../src/app')
 const bathroomsRouter = require('../src/bathrooms/bathrooms-router')
 const { makeBathroomsArray, makeMaliciousBathroom } = require('./bathrooms.fixtures')
+const { expect } = require('chai')
 const { makeUsersArray } = require('./users.fixtures')
+const jwt = require('jsonwebtoken')
+require('dotenv').config();
 
 describe('Bathrooms Endpoints', function() {
     let db
@@ -23,6 +26,13 @@ describe('Bathrooms Endpoints', function() {
 
     afterEach('cleanup',() => db.raw('TRUNCATE bathrooms, users RESTART IDENTITY CASCADE'))
 
+    function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
+      const token = jwt.sign({userid: user.id }, secret, {
+        subject: user.username,
+        algorithm: 'HS256',
+      })
+      return `Bearer ${token}`
+    } 
 
     describe(`GET /api/bathrooms`, () => {
         context(`Given no bathrooms`, () => {
@@ -73,6 +83,7 @@ describe('Bathrooms Endpoints', function() {
           it('removes XSS attack content', () => {
             return supertest(app)
               .get(`/api/bathrooms`)
+              .set('Authorization', makeAuthHeader(testUsers[0]))
               .expect(200)
               .expect(res => {
                 expect(res.body[0].br_name).to.eql(expectedBathroom.br_name)
@@ -144,6 +155,7 @@ describe('Bathrooms Endpoints', function() {
         })
     describe(`POST /api/bathrooms`, () => {
         const testUsers = makeUsersArray();
+        const testUser = testUsers[0]
         beforeEach('insert malicious bathroom', () => {
           return db
             .into('users')
@@ -159,10 +171,16 @@ describe('Bathrooms Endpoints', function() {
             description: 'brooklyn',
             user_id: 1,
             category: 'user_added',
-
+            // ishandicap: false,
+            // isfamily: false,
+            // hasstalls: true,
+            // isprivate: false,
+            // gender_neutral: true,
+            // hasbaby_table: false
           }
           return supertest(app)
             .post('/api/bathrooms')
+            .set('Authorization', makeAuthHeader(testUsers[0]))
             .send(newBathroom)
             .expect(201)
             .expect(res => {
@@ -187,6 +205,7 @@ describe('Bathrooms Endpoints', function() {
             .then(res =>
               supertest(app)
                 .get(`/api/bathrooms/${res.body.id}`)
+                .set('Authorization', makeAuthHeader(testUsers[0]))
                 .expect(res.body)
             )
         })
@@ -209,6 +228,7 @@ describe('Bathrooms Endpoints', function() {
     
             return supertest(app)
               .post('/api/bathrooms')
+              .set('Authorization', makeAuthHeader(testUsers[0]))
               .send(newBathroom)
               .expect(400, {
                 error: { message: `Missing '${field}' in request body` }
@@ -220,6 +240,7 @@ describe('Bathrooms Endpoints', function() {
           const { maliciousBathroom, expectedBathroom } = makeMaliciousBathroom()
           return supertest(app)
             .post(`/api/bathrooms`)
+            .set('Authorization', makeAuthHeader(testUsers[0]))
             .send(maliciousBathroom)
             .expect(201)
             .expect(res => {
@@ -229,12 +250,13 @@ describe('Bathrooms Endpoints', function() {
         })
       })
     
-    describe(`DELETE /api/bathrooms/:bathroom_id`, () => {
+    describe(`DELETE /api/bathrooms/:bathroom_id`, () => {  const testUsers = makeUsersArray();
         context(`Given no bathrooms`, () => {
           it(`responds with 404`, () => {
             const bathroomId = 123456
             return supertest(app)
               .delete(`/api/bathrooms/${bathroomId}`)
+              .set('Authorization', makeAuthHeader(testUsers[0]))
               .expect(404, { error: { message: `Bathroom doesn't exist` } })
           })
         })
@@ -259,6 +281,7 @@ describe('Bathrooms Endpoints', function() {
             const expectedBathrooms = testBathrooms.filter(bathroom => bathroom.id !== idToRemove)
             return supertest(app)
               .delete(`/api/bathrooms/${idToRemove}`)
+              .set('Authorization', makeAuthHeader(testUsers[0]))
               .expect(204)
               .then(res =>
                 supertest(app)

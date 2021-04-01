@@ -23,8 +23,7 @@ app.use(helmet())
 
 app.use('/api/auth', authRouter)
 app.use('/api/users', usersRouter)
-app.use('/api/bathrooms', bathroomsRouter) // 
-//app.use('/api/tags', tagsRouter)
+app.use('/api/bathrooms', bathroomsRouter) 
 app.use('/api/comments', commentsRouter)
 app.use('/api/favorites', favoritesRouter)
 app.use('/api/rates', ratesRouter)

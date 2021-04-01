@@ -109,4 +109,16 @@ favoritesRouter
         //       .catch(next)
         //   })
         
+        // favoritesRouter
+        //   .route('/:bathroom_id')
+        //   .get((req, res, next ) => {
+        //       const knexInstance = req.app.get('db')
+        //       FavoritesService.getBathroomFavorites(knexInstance, req.params.bathroom_id)  
+        //       .then(favorites => {
+        //           res.json(favorites.map(serializeFavorite))
+        //       })
+        //       .catch(next)
+        //   })
+          //NEED GET BATHROOM FAVORITE COUNT
+          
         module.exports = favoritesRouter
