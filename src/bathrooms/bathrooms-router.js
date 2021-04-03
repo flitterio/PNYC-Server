@@ -48,8 +48,8 @@ bathroomsRouter
 //   })
 
 .post(requireAuth, jsonParser, (req, res, next) => {
-    const{id, br_name, lat, lng, user_id, category, description='Bathroom', ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table} = req.body
-    let newBathroom = { id, br_name, lat, lng, user_id, category}
+    const{id, br_name, lat, lng, category='user_added', description='Bathroom', ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table} = req.body
+    let newBathroom = { id, br_name, lat, lng,  category}
 
     for(const [key, value] of Object.entries(newBathroom)) {
         if (value == null) {
@@ -60,7 +60,10 @@ bathroomsRouter
     }
 
     newBathroom = { ...newBathroom, description,ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table } 
-    BathroomsService.insertBathroom(
+
+    newBathroom.user_id = req.user.id
+
+    return BathroomsService.insertBathroom(
         req.app.get('db'),
         newBathroom
     )
