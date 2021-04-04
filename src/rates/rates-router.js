@@ -3,6 +3,7 @@ const express = require('express')
 const xss = require('xss')
 const RatesService = require('./rates-service')
 const { serializeRate } = require('./rates-service')
+const { requireAuth } = require('../middleware/jwt-auth')
 
 const ratesRouter = express.Router()
 const jsonParser = express.json()
@@ -36,10 +37,11 @@ ratesRouter
 //     .catch(next)
 //   })
 
-.post( jsonParser, (req, res, next) => {
+.post(requireAuth, jsonParser, (req, res, next) => {
+
     //WILL USE USER AUTHENTICATION,, ADD reqauth IN POST PARAMETERS
-    const{ user_id, rating, rate_category, bathroom_id } = req.body
-    let newRate = { rating, rate_category, user_id }
+    const{ rating, bathroom_id } = req.body
+    let newRate = { rating }
 
     for(const [key, value] of Object.entries(newRate)) {
         if (value == null) {
@@ -50,8 +52,8 @@ ratesRouter
     }
  
     newRate = {...newRate, bathroom_id}
-
-    // newRate.user_id = req.user.id 
+    newRate.user_id = req.user.id
+    
 
     return RatesService.insertRate(
         req.app.get('db'),

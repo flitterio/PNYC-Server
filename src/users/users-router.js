@@ -5,6 +5,9 @@ const UsersService = require('./users-service')
 const usersRouter = express.Router()
 const jsonBodyParser = express.json()
 const {requireAuth} = require('../middleware/jwt-auth')
+const RatesService = require('../rates/rates-service')
+const { serializeRate } = require('../rates/rates-service')
+const FavoritesService = require('../favorites/favorites-service')
 
   usersRouter
   .post('/', jsonBodyParser, (req, res, next) => {
@@ -48,7 +51,7 @@ const {requireAuth} = require('../middleware/jwt-auth')
                    res
                      .status(201)
                      .location(path.posix.join(req.originalUrl, `/${user.id}`))
-                     .json(UsersService.serializeUser(user))
+                     .json(serializeUser(user))
              })
          })
 
@@ -60,15 +63,32 @@ usersRouter
   .route('/')
   .all(requireAuth)
   .get((req, res, next) => {
+    let userInfo = {}
     UsersService.getUserInfo(
       req.app.get('db'),
       req.user.id
     )
     .then(user =>{
-       res.json(user)
+       userInfo = user
+
+       FavoritesService.getUserFavorites(
+         req.app.get('db'),
+         req.user.id
+       )
+       .then(favorites => {
+         userInfo['favorites'] = favorites
+         res.user = userInfo
+         res.json(serializeUser(res.user))
+         next()
+       })
+       .catch(next)
     })
       .catch(next)
   })
+
+  // .get((req, res, next) => {
+  //   res.json(UsersService.serializeUser(res.user))
+  //   })
   
   usersRouter
     .route('/:user_id')
@@ -121,6 +141,18 @@ usersRouter
       )
         .then(numRowsAffected => {
           res.status(204).end()
+        })
+        .catch(next)
+    })
+
+    usersRouter
+    .route('/:user_id/rates')
+    .all(requireAuth)
+    .get((req, res, next ) => {
+        const knexInstance = req.app.get('db')
+        RatesService.getUserRates(knexInstance, req.user.id)  
+        .then(favorites => {
+            res.json(favorites.map(RatesService.serializeRate))
         })
         .catch(next)
     })

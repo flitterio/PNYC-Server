@@ -28,6 +28,12 @@ const RatesService = {
                 .where('id', id)
                 .first()
           },
+          getUserRates(knex, user_id){
+              return knex   
+                .from('rates')
+                .select('*')
+                .where('user_id', user_id)
+          },
          
      deleteRate(knex, id) {
                return knex('rates')

@@ -60,7 +60,9 @@ const UsersService = {
       fname: xss(user.fname),
       lname: xss(user.lname),
       username: xss(user.username),
+      password: xss(user.password),
       date_created: new Date(user.date_created),
+      favorites: user.favorites
     }
   },
 }
