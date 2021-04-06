@@ -38,8 +38,7 @@ ratesRouter
 //   })
 
 .post(requireAuth, jsonParser, (req, res, next) => {
-
-    //WILL USE USER AUTHENTICATION,, ADD reqauth IN POST PARAMETERS
+    
     const{ rating, bathroom_id } = req.body
     let newRate = { rating }
 
@@ -53,20 +52,81 @@ ratesRouter
  
     newRate = {...newRate, bathroom_id}
     newRate.user_id = req.user.id
-    
 
-    return RatesService.insertRate(
+        RatesService.getUserRateForBathroom(
         req.app.get('db'),
-        newRate
+        req.user.id,
+        bathroom_id
     )
-        .then(rate => {
-            res 
-                .status(201)
-                .location(path.posix.join(req.originalUrl + `/${rate.id}`))
-                .json(serializeRate(rate))
-        })
-        .catch(next)
+    .then(rate => {
+        console.log('rate', rate)
+        if (rate.length === 0) {
+            console.log('empty')
+            RatesService.insertRate(
+                req.app.get('db'),
+                newRate
+            )
+                .then(rate => {
+                    res 
+                        .status(201)
+                        .location(path.posix.join(req.originalUrl + `/${rate.id}`))
+                        .json(serializeRate(rate))
+                })
+                .catch(next)
+        }
+        else {
+            return res.status(400).json({
+                error: {message: `User has already rated` }
+            })
+        //     console.log('rate is there')
+        //     console.log('rate id', rate[0].id)
+        //     console.log('rating to update', newRate.rating)
+
+        //     RatesService.updateRate(
+        //         req.app.get('db'),
+        //         rate[0].id,
+        //         newRate.rating
+        //     )
+        //     .then(numRowsAffected => {
+        //         res.status(204).end()
+        //     })
+        //     .catch(next)
+         }
+        
     })
+    .catch(next)
+        
+
+
+        
+
+  //if ratingId = null -> return as normal
+  //else -> patch rating
+    // if(ratingId == null ){
+    //     return RatesService.insertRate(
+    //         req.app.get('db'),
+    //         newRate
+    //     )
+    //         .then(rate => {
+    //             res 
+    //                 .status(201)
+    //                 .location(path.posix.join(req.originalUrl + `/${rate.id}`))
+    //                 .json(serializeRate(rate))
+    //         })
+    //         .catch(next)
+    // }
+    // else {
+    //     RatesService.updateRate(
+    //         req.app.get('db'),
+    //         ratingId[0].id,
+    //         newRate.rating
+    //     )
+    //     .then(numRowsAffected => {
+    //         res.status(204).end()
+    //     })
+    //     .catch(next)
+    // }
+})
 
 ratesRouter
     .route('/:rate_id')
@@ -99,6 +159,7 @@ ratesRouter
         })
         .catch(next)
     })
+
     .patch(jsonParser, (req, res, next) => {
         const { rating} = req.body
         const rateToUpdate = {rating}

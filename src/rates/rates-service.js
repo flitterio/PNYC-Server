@@ -34,6 +34,16 @@ const RatesService = {
                 .select('*')
                 .where('user_id', user_id)
           },
+
+          getUserRateForBathroom(knex, user_id, bathroom_id){
+              return knex
+                .from('rates')
+                .select('*')
+                .where('bathroom_id', bathroom_id)
+                .where('user_id', user_id)
+          },
+          //get user rating for bathroom
+          //make sure to know what to return
          
      deleteRate(knex, id) {
                return knex('rates')
