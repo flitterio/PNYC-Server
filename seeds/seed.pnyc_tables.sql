@@ -5,9 +5,10 @@ TRUNCATE
     bathrooms,
     users,
 
-INSERT INTO users (fname,lname,username,"password",date_created) VALUES
-	 ('user','one','exampleuser','$2a$12$hexm1Td1j6RnyBBZMKI0fOFQ/ueCONJjJrfG2UlLNw2e6Nrv4Dk06','2021-04-03 17:50:30.811'),
-	 ('Wesley','Diaz','wdiaz13','$2a$12$McWcBnLwBNO2.sTdV/7o0exear1AY.Wv80iJCKFhKPBnqPQH3qnFy','2021-03-29 15:00:33.310');
+INSERT INTO users (id, fname,lname,username,password, date_created) 
+VALUES
+	 (1, 'user','one','exampleuser','$2a$12$hexm1Td1j6RnyBBZMKI0fOFQ/ueCONJjJrfG2UlLNw2e6Nrv4Dk06','2021-04-03 17:50:30.811'),
+	 (4, 'Wesley','Diaz','wdiaz13','$2a$12$McWcBnLwBNO2.sTdV/7o0exear1AY.Wv80iJCKFhKPBnqPQH3qnFy','2021-03-29 15:00:33.310');
 
 INSERT INTO bathrooms (id,br_name,lat,lng,description,user_id,category,ishandicap,isfamily,hasstalls,isprivate,gender_neutral,hasbaby_table) 
 VALUES
