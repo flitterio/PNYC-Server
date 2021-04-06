@@ -78,6 +78,9 @@ ratesRouter
             return res.status(400).json({
                 error: {message: `User has already rated` }
             })
+
+            //TEMPORARY FIX UNTIL I AM ABLE TO FIGURE OUT WHATS WRONG WITH MY UPDATE STATEMENT
+            
         //     console.log('rate is there')
         //     console.log('rate id', rate[0].id)
         //     console.log('rating to update', newRate.rating)
