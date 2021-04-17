@@ -29,10 +29,10 @@ GET /api/bathrooms/:bathroom_id/comments : Gets all the comments for a bathroom
 ### Users (Protected Endpoints)
 POST api/users : Creates a New User
 
-GET api/users/:userId : Gets a User's information 
+GET api/users : Gets a User's information 
 
 DELETE api/users/:userId : Deletes a User
 
-PATCH api/ users/:userId : 
+PATCH api/ users/:userId : Edits a User
 
 
