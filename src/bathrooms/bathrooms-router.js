@@ -1,6 +1,5 @@
 const path = require('path')
 const express = require('express')
-// const xss = require('xss')
 const BathroomsService = require('./bathrooms-service')
 const RatesService = require('../rates/rates-service')
 const FavoritesService = require('../favorites/favorites-service')
@@ -9,25 +8,11 @@ const jsonParser = express.json()
 const { requireAuth } = require('../middleware/jwt-auth')
 const { response } = require('../app')
 
-// const serializeBathroom = bathroom => ({
-//     id: bathroom.id,
-//     br_name: xss(bathroom.br_name),
-//     lat: bathroom.lat,
-//     lng: bathroom.lng,
-//     description: xss(bathroom.description),
-//     user_id: bathroom.user_id,
-//     category: bathroom.category,
-//     tags: {
-//         id: tags.id,
-//         tag: tags.tag,
-//     }
-// })
 
 bathroomsRouter
     .route('/')
     .get((req, res, next) => {
         const knexInstance = req.app.get('db')
-        //const bathrooms = []
         BathroomsService.getAllBathrooms(knexInstance)
        
         //can add information to the bathrooms array, then return final array with response
@@ -36,16 +21,6 @@ bathroomsRouter
         })
         .catch(next)
   })
-//   .delete((req, res, next) => {
-//     BathroomsService.deleteBathroom(
-//         req.app.get('db'),
-//         req.params.bathroom_id
-//     )
-//     .then(() => {
-//         res.status(204).end()
-//     })
-//     .catch(next)
-//   })
 
 .post(requireAuth, jsonParser, (req, res, next) => {
     const{id, br_name, lat, lng, category='user_added', description='Bathroom', ishandicap, isfamily, hasstalls, isprivate, gender_neutral, hasbaby_table} = req.body
@@ -92,28 +67,23 @@ bathroomsRouter
                 })
             }
             bathroomInfo = bathroom
-           // res.bathroom = bathroom 
-            // next()
             RatesService.getByBrId(
                 req.app.get('db'),
                 req.params.bathroom_id
             )
             .then(rates => {
-                // const ratesArr = rates.map(RatesService.serializeRate)
                 let ratings = rates.map(r => r.rating)
                 console.log('rates', ratings)
                 const reducer = (accumulator, currentValue) => accumulator + currentValue;
                 if(ratings.length !== 0){
                 const rating = (ratings.reduce(reducer)) / ratings.length 
                 
-                // res.json(rates.map(RatesService.serializeRate))
                 console.log('post function', rating)
                 bathroomInfo['rate'] = rating }
                 else{
                     bathroomInfo['rate'] = 0
                 }
                 res.bathroom = bathroomInfo
-                // next()
             })
             .catch(next)
             
@@ -128,16 +98,6 @@ bathroomsRouter
                 next()
             })
             .catch(next)
-
-        //     BathroomsService.getCommentsForBathroom(
-        //         req.app.get('db'),
-        //         req.params.bathroom_id
-        //         )
-        //         .then(comments => {
-        //             res.json(comments.map(BathroomsService.serializeComment))
-        //             next()
-        //         })
-        //         .catch(next)
          })
         .catch(next)
     })
@@ -145,16 +105,16 @@ bathroomsRouter
     .get((req, res, next) => {
         res.json(BathroomsService.serializeBathroom(res.bathroom))
     })
-    //where should I check if user ID === current logged in user id?
+
     .delete(requireAuth, (req, res, next) => {
-        BathroomsService.deleteBathroom(
-            req.app.get('db'),
-            req.params.bathroom_id
-        )
-        .then(numRowsAffected => {
-            res.status(204).end()
-        })
-        .catch(next)
+            BathroomsService.deleteBathroom(
+                req.app.get('db'),
+                req.params.bathroom_id
+            )
+            .then(numRowsAffected => {
+                res.status(204).end()
+            })
+            .catch(next)
     })
     // .patch(jsonParser, (req, res, next) => {
     //     const { br_name, description} = req.body

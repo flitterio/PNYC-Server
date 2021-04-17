@@ -61,7 +61,6 @@ const BathroomsService = {
             .first()
          },
 
-         //need to make sure this requires auth of the person who created the bathroom
      deleteBathroom(knex, id) {
                return knex('bathrooms')
                  .where({ id })
