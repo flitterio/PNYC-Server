@@ -116,28 +116,7 @@ bathroomsRouter
             })
             .catch(next)
     })
-    // .patch(jsonParser, (req, res, next) => {
-    //     const { br_name, description} = req.body
-    //     const bathroomToUpdate = { br_name, description }
-
-    //     const numberOfValues = Object.values(bathroomToUpdate).filter(Boolean).length
-    //     if(numberOfValues === 0) {
-    //         return res.status(400).json({
-    //             error: {
-    //                 message: `Request body must contain either 'name' or 'description'`
-    //             }
-    //         })
-    //     }
-    //     BathroomsService.updateBathroom(
-    //         req.app.get('db'),
-    //         req.params.bathroom_id,
-    //         bathroomToUpdate
-    //     )
-    //     .then(numRowsAffected => {
-    //         res.status(204).end()
-    //     })
-    //     .catch(next)
-    // })
+   
 bathroomsRouter
     .route('/:bathroom_id/rates')
     .all(checkBathroomExists)
@@ -154,7 +133,6 @@ bathroomsRouter
 
 bathroomsRouter
     .route('/:bathroom_id/comments')
-    //.all(requireAuth)
     .all(checkBathroomExists)
     .get((req, res, next) => {
         BathroomsService.getCommentsForBathroom(
@@ -186,16 +164,5 @@ async function checkBathroomExists(req, res, next) {
         next(error)
     }
     }
-
-    bathroomsRouter
-          .route('/:bathroom_id/favorites')
-          .get((req, res, next ) => {
-              const knexInstance = req.app.get('db')
-              FavoritesService.getBathroomFavorites(knexInstance, req.params.bathroom_id)  
-              .then(favorites => {
-                  res.json(favorites.map(FavoritesService.serializeFavorite))
-              })
-              .catch(next)
-          })
 
   module.exports = bathroomsRouter

@@ -162,21 +162,16 @@ describe('Bathrooms Endpoints', function() {
             .insert(testUsers)
         })
     
-        it(`creates an bathroom, responding with 201 and the new bathroom`, () => {
+        it(`creates a bathroom, responding with 201 and the new bathroom`, () => {
           const newBathroom = {
             id: 'diowl89sE',
             br_name: 'brooklyn',
-            lat: '40.678200',
-            lng: '-73.944200',
+            lat: 40.678200,
+            lng: -73.944200,
             description: 'brooklyn',
             user_id: 1,
             category: 'user_added',
-            // ishandicap: false,
-            // isfamily: false,
-            // hasstalls: true,
-            // isprivate: false,
-            // gender_neutral: true,
-            // hasbaby_table: false
+            rate: 0,
           }
           return supertest(app)
             .post('/api/bathrooms')
@@ -190,6 +185,7 @@ describe('Bathrooms Endpoints', function() {
               expect(res.body.description).to.eql(newBathroom.description)
               expect(res.body.user_id).to.eql(newBathroom.user_id)
               expect(res.body.category).to.eql(newBathroom.category)
+              expect(res.body.rate).to.eql(newBathroom.rate)
               expect(res.body).to.have.property('id')
               expect(res.body).to.have.property('ishandicap')
               expect(res.body).to.have.property('isfamily')
@@ -198,9 +194,6 @@ describe('Bathrooms Endpoints', function() {
               expect(res.body).to.have.property('gender_neutral')
               expect(res.body).to.have.property('hasbaby_table')
               expect(res.headers.location).to.eql(`/api/bathrooms/${res.body.id}`)
-            //   const expected = new Intl.DateTimeFormat('en-US').format(new Date())
-            //   const actual = new Intl.DateTimeFormat('en-US').format(new Date(res.body.date_published))
-              //expect(actual).to.eql(expected)
             })
             .then(res =>
               supertest(app)
@@ -210,7 +203,7 @@ describe('Bathrooms Endpoints', function() {
             )
         })
     
-        const requiredFields = ['id', 'br_name', 'lat', 'lng', 'user_id', 'category']
+        const requiredFields = ['id', 'br_name', 'lat', 'lng']
     
         requiredFields.forEach(field => {
           const newBathroom = {

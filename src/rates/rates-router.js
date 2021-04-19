@@ -8,13 +8,6 @@ const { requireAuth } = require('../middleware/jwt-auth')
 const ratesRouter = express.Router()
 const jsonParser = express.json()
 
-// const serializeRate = rate => ({
-//     id: rate.id,
-//     rate_category: rate.rate_category,
-//     rating: rate.rating,
-//     user_id: rate.user_id
-// })
-
 ratesRouter
     .route('/')
     .get((req, res, next) => {
@@ -25,17 +18,6 @@ ratesRouter
         })
         .catch(next)
   })
-  //DELETE SHOULD BE WHERE RATE ID IS SPECIFIC
-//   .delete((req, res, next) => {
-//     RatesService.deleteRate(
-//         req.app.get('db'),
-//         req.params.rate_id
-//     )
-//     .then(() => {
-//         res.status(204).end()
-//     })
-//     .catch(next)
-//   })
 
 .post(requireAuth, jsonParser, (req, res, next) => {
     
@@ -78,57 +60,10 @@ ratesRouter
             return res.status(400).json({
                 error: {message: `User has already rated` }
             })
-
-            //TEMPORARY FIX UNTIL I AM ABLE TO FIGURE OUT WHATS WRONG WITH MY UPDATE STATEMENT
-            
-        //     console.log('rate is there')
-        //     console.log('rate id', rate[0].id)
-        //     console.log('rating to update', newRate.rating)
-
-        //     RatesService.updateRate(
-        //         req.app.get('db'),
-        //         rate[0].id,
-        //         newRate.rating
-        //     )
-        //     .then(numRowsAffected => {
-        //         res.status(204).end()
-        //     })
-        //     .catch(next)
          }
         
     })
     .catch(next)
-        
-
-
-        
-
-  //if ratingId = null -> return as normal
-  //else -> patch rating
-    // if(ratingId == null ){
-    //     return RatesService.insertRate(
-    //         req.app.get('db'),
-    //         newRate
-    //     )
-    //         .then(rate => {
-    //             res 
-    //                 .status(201)
-    //                 .location(path.posix.join(req.originalUrl + `/${rate.id}`))
-    //                 .json(serializeRate(rate))
-    //         })
-    //         .catch(next)
-    // }
-    // else {
-    //     RatesService.updateRate(
-    //         req.app.get('db'),
-    //         ratingId[0].id,
-    //         newRate.rating
-    //     )
-    //     .then(numRowsAffected => {
-    //         res.status(204).end()
-    //     })
-    //     .catch(next)
-    // }
 })
 
 ratesRouter

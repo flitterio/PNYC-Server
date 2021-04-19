@@ -3,8 +3,8 @@ function makeBathroomsArray() {
         {
             id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
             br_name: 'Arcilla Playground',
-            lat: '40.663930',
-            lng: '-73.938274',
+            lat: 40.663930,
+            lng: -73.938274,
             description: 'playground',
             user_id: 1,
             category: 'preloaded',
@@ -13,13 +13,14 @@ function makeBathroomsArray() {
             hasstalls: false,
             isprivate: false,
             gender_neutral: false,
-            hasbaby_table: false
+            hasbaby_table: false,
+            rate: 0
         },
         {
             id: 'faijsdfilok',
             br_name: 'Playground',
-            lat: '40.663778',
-            lng: '-73.938909',
+            lat: 40.663778,
+            lng: -73.938909,
             description: '',
             user_id: 1,
             category: 'preloaded',
@@ -28,7 +29,8 @@ function makeBathroomsArray() {
             hasstalls: false,
             isprivate: false,
             gender_neutral: false,
-            hasbaby_table: false
+            hasbaby_table: false,
+            rate: 0
         },
     ];
 }

@@ -104,18 +104,18 @@ function makeRatesArray(){[
 
 ]}
 
-function makeFavoritesArray(){[
-    {
-        id: 1,
-        bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
-        user_id: 1
-    },
-    {
-        id: 2,
-        bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
-        user_id: 2
-    }
-]}
+// function makeFavoritesArray(){[
+//     {
+//         id: 1,
+//         bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
+//         user_id: 1
+//     },
+//     {
+//         id: 2,
+//         bathroom_id: 'QXJjaWxsYSBQbGF5Z3JvdW5k',
+//         user_id: 2
+//     }
+// ]}
 
 // function makeTagsArray(){[
 //     {
@@ -131,7 +131,7 @@ function makeFavoritesArray(){[
 
 // ]}
 
-function makeCommentsArray(users, bathrooms) {
+function makeCommentsArray(users) {
   return [
     {
       id: 1,
@@ -185,53 +185,45 @@ function makeCommentsArray(users, bathrooms) {
   ];
 }
 
-// function makeExpectedBathroom(users, bathroom, comments=[]) {
-//   const author = users
-//     .find(user => user.id === bathroom.author_id)
+function makeExpectedBathroom(bathroom) {
+  return {
+    id: bathroom.id,
+    br_name: bathroom.br_name,
+    lat: parseFloat(bathroom.lat),
+    lng: parseFloat(bathroom.lng),
+    description: bathroom.description,
+    user_id: bathroom.user_id,
+    category: bathroom.category,
+    ishandicap: bathroom.ishandicap,
+    isfamily: bathroom.isfamily,
+    hasstalls: bathroom.hasstalls,
+    isprivate: bathroom.isprivate,
+    gender_neutral: bathroom.gender_neutral,
+    hasbaby_table: bathroom.hasbaby_table,
+    }
+}
 
-//   const number_of_comments = comments
-//     .filter(comment => comment.bathroom_id === bathroom.id)
-//     .length
+function makeExpectedbathroomComments(users, bathroomId, comments) {
+  const expectedComments = comments
+    .filter(comment => comment.bathroom_id === bathroomId)
 
-//   return {
-//     id: bathroom.id,
-//     style: bathroom.style,
-//     title: bathroom.title,
-//     content: bathroom.content,
-//     date_created: bathroom.date_created.toISOString(),
-//     number_of_comments,
-//     author: {
-//       id: author.id,
-//       username: author.username,
-//       fname: author.fname,
-//       nickname: author.nickname,
-//       date_created: author.date_created.toISOString(),
-//       date_modified: author.date_modified || null,
-//     },
-//   }
-// }
-
-// function makeExpectedbathroomComments(users, bathroomId, comments) {
-//   const expectedComments = comments
-//     .filter(comment => comment.bathroom_id === bathroomId)
-
-//   return expectedComments.map(comment => {
-//     const commentUser = users.find(user => user.id === comment.user_id)
-//     return {
-//       id: comment.id,
-//       text: comment.text,
-//       date_created: comment.date_created.toISOString(),
-//       user: {
-//         id: commentUser.id,
-//         username: commentUser.username,
-//         fname: commentUser.fname,
-//         nickname: commentUser.nickname,
-//         date_created: commentUser.date_created.toISOString(),
-//         date_modified: commentUser.date_modified || null,
-//       }
-//     }
-//   })
-// }
+  return expectedComments.map(comment => {
+    const commentUser = users.find(user => user.id === comment.user_id)
+    return {
+      id: comment.id,
+      text: comment.text,
+      bathroom_id: comment.bathroom_id,
+      date_commented: new Date(comment.date_commented),
+      user: {
+        id: commentUser.id,
+        username: commentUser.username,
+        fname: commentUser.fname,
+        lname: commentUser.lname,
+        date_created: new Date(user.date_created),
+      }
+    }
+  })
+}
 
 // function makeMaliciousbathroom(user) {
 //   const maliciousbathroom = {
@@ -253,70 +245,72 @@ function makeCommentsArray(users, bathrooms) {
 //   }
 // }
 
-// function makebathroomsFixtures() {
-//   const testUsers = makeUsersArray()
-//   const testbathrooms = makebathroomsArray(testUsers)
-//   const testComments = makeCommentsArray(testUsers, testbathrooms)
-//   return { testUsers, testArticles, testComments }
-// }
+function makeBathroomsFixtures() {
+  const testUsers = makeUsersArray()
+  const testBathrooms = makeBathroomsArray(testUsers)
+  const testComments = makeCommentsArray(testUsers, testBathrooms)
+  return { testUsers, testBathrooms, testComments }
+}
 
-// function cleanTables(db) {
-//   return db.transaction(trx =>
-//     trx.raw(
-//       `TRUNCATE
-//         blogful_articles,
-//         blogful_users,
-//         blogful_comments
-//       `
-//     )
-//     .then(() =>
-//       Promise.all([
-//         trx.raw(`ALTER SEQUENCE blogful_articles_id_seq minvalue 0 START WITH 1`),
-//         trx.raw(`ALTER SEQUENCE blogful_users_id_seq minvalue 0 START WITH 1`),
-//         trx.raw(`ALTER SEQUENCE blogful_comments_id_seq minvalue 0 START WITH 1`),
-//         trx.raw(`SELECT setval('blogful_articles_id_seq', 0)`),
-//         trx.raw(`SELECT setval('blogful_users_id_seq', 0)`),
-//         trx.raw(`SELECT setval('blogful_comments_id_seq', 0)`),
-//       ])
-//     )
-//   )
-// }
+function cleanTables(db) {
+  return db.transaction(trx =>
+    trx.raw(
+      `TRUNCATE
+        rates,
+        comments,
+        bathrooms,
+        users
+        RESTART IDENTITY CASCADE
+      `
+    )
+    // .then(() =>
+    //   Promise.all([
+    //     trx.raw(`ALTER SEQUENCE users_id_seq minvalue 0 START WITH 1`),
+    //     trx.raw(`ALTER SEQUENCE comments_id_seq minvalue 0 START WITH 1`),
+    //     trx.raw(`ALTER SEQUENCE rates_id_seq minvalue 0 START WITH 1`),
+    //     trx.raw(`SELECT setval('users_id_seq', 0)`),
+    //     trx.raw(`SELECT setval('comments_id_seq', 0)`),
+    //     trx.raw(`SELECT setval('rates_id_seq', 0)`),
+    //   ])
+    // )
+  )
+}
 
 function seedUsers(db, users) {
   const preppedUsers = users.map(user => ({
     ...user,
     password: bcrypt.hashSync(user.password, 1)
   }))
-  return db.into('blogful_users').insert(preppedUsers)
-    .then(() =>
-      // update the auto sequence to stay in sync
-      db.raw(
-        `SELECT setval('blogful_users_id_seq', ?)`,
-        [users[users.length - 1].id],
-      )
-    )
+  return db.into('users').insert(preppedUsers)
+    // .then(() =>
+    //   // update the auto sequence to stay in sync
+    //   db.raw(
+    //     `SELECT setval('users_id_seq', ?)`,
+    //     [users[users.length - 1].id],
+    //   )
+    // )
 }
 
-// function seedBathroomTables(db, users, bathrooms, comments=[]) {
-//   // use a transaction to group the queries and auto rollback on any failure
-//   return db.transaction(async trx => {
-//     await seedUsers(trx, users)
-//     await trx.into('blogful_articles').insert(articles)
-//     // update the auto sequence to match the forced id values
-//     await trx.raw(
-//       `SELECT setval('blogful_articles_id_seq', ?)`,
-//       [articles[articles.length - 1].id],
-//     )
-//     // only insert comments if there are some, also update the sequence counter
-//     if (comments.length) {
-//       await trx.into('blogful_comments').insert(comments)
-//       await trx.raw(
-//         `SELECT setval('blogful_comments_id_seq', ?)`,
-//         [comments[comments.length - 1].id],
-//       )
-//     }
-//   })
-// }
+function seedBathroomsTables(db, users, bathrooms, comments=[]) {
+  // use a transaction to group the queries and auto rollback on any failure
+  return db.transaction(async trx => {
+    await seedUsers(trx, users)
+    await trx.into('bathrooms').insert(bathrooms)
+    // update the auto sequence to match the forced id values
+    // await trx.raw(
+    //   `SELECT setval('blogful_articles_id_seq', ?)`,
+    //   [articles[articles.length - 1].id],
+    // )
+    // only insert comments if there are some, also update the sequence counter
+    if (comments.length) {
+      await trx.into('comments').insert(comments)
+      await trx.raw(
+        `SELECT setval('comments_id_seq', ?)`,
+        [comments[comments.length - 1].id],
+      )
+    }
+  })
+}
 
 // function seedMaliciousArticle(db, user, article) {
 //   return seedUsers(db, [user])
@@ -337,14 +331,17 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 
 module.exports = {
   makeUsersArray,
-  makeBathroomsArray,
-//   makeExpectedArticle,
-//   makeExpectedArticleComments,
+  makeBathroomsArray,   
+  makeExpectedBathroom,
+  makeCommentsArray,
+  makeRatesArray,
+  seedBathroomsTables,
+  makeBathroomsFixtures,
 //   makeMaliciousArticle,
 //   makeCommentsArray,
 
 //   makeArticlesFixtures,
-//   cleanTables,
+   cleanTables,
 //   seedArticlesTables,
 //   seedMaliciousArticle,
   makeAuthHeader,

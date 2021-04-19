@@ -6,7 +6,6 @@ const usersRouter = express.Router()
 const jsonBodyParser = express.json()
 const {requireAuth} = require('../middleware/jwt-auth')
 const RatesService = require('../rates/rates-service')
-const { serializeRate } = require('../rates/rates-service')
 const FavoritesService = require('../favorites/favorites-service')
 
   usersRouter
@@ -85,10 +84,6 @@ usersRouter
     })
       .catch(next)
   })
-
-  // .get((req, res, next) => {
-  //   res.json(UsersService.serializeUser(res.user))
-  //   })
   
   usersRouter
     .route('/:user_id')
@@ -122,28 +117,7 @@ usersRouter
         })
         .catch(next)
     })
-    .patch(jsonBodyParser, (req, res, next) => {
-      const { fname, lname, username } = req.body
-      const userToUpdate = { fname, lname, username}
-  
-      const numberOfValues = Object.values(userToUpdate).filter(Boolean).length
-      if (numberOfValues === 0)
-        return res.status(400).json({
-          error: {
-            message: `Request body must contain either first name, last name, or username`
-          }
-        })
-  
-      UsersService.updateUser(
-        req.app.get('db'),
-        req.user.id,
-        userToUpdate
-      )
-        .then(numRowsAffected => {
-          res.status(204).end()
-        })
-        .catch(next)
-    })
+    
 
     usersRouter
     .route('/:user_id/rates')

@@ -142,8 +142,8 @@ const BathroomsService = {
             isprivate: bathroom.isprivate,
             gender_neutral: bathroom.gender_neutral,
             hasbaby_table: bathroom.hasbaby_table,
-            rate: bathroom.rate,
-            favorites: bathroom.favorites,
+            rate: bathroom.rate || 0,
+            // favorites: bathroom.favorites,
             //number_of_favorites: Number(bathroom.number_of_favorites) || 0,
             // rates: {
             //     id: rates.id,
