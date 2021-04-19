@@ -33,6 +33,20 @@ GET api/users : Gets a User's information
 
 DELETE api/users/:userId : Deletes a User
 
-PATCH api/ users/:userId : Edits a User
+GET api/ users/:userId/rates : gets all of the rates from a user
 
+### Rates 
+
+GET api/rates : Gets all rates
+
+POST api/rates (protected endpoint) : Add new rating
+
+DELETE api/rates/:rate_id : Delete a rating
+
+PATCH api/rates/:rate_id : Edit a rating
+
+
+### Comments (Protected Endpoint)
+
+POST api/comments : Add a new comment
 
