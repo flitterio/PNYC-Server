@@ -1,26 +1,52 @@
-# Express Boilerplate!
+# PNYC SERVER
 
-This is a boilerplate project used for starting new projects!
+Check out the front end at https://github.com/flitterio/PNYC-Client
 
-## Set up
+Live Version: https://pnyc-client-flitterio.vercel.app/
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+## Endpoints 
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+### Authorization 
+POST /api/auth/singin : Authorizes User Sign In with JWT Authentication 
 
-## Scripts
+POST /api/auth/refresh : Refreshes the page after period of time to keep user logged in
 
-Start the application `npm start`
+### Bathrooms 
+GET /api/bathrooms : Gets all bathrooms
 
-Start nodemon for the application `npm run dev`
+POST /api/bathrooms (protected endpoint) : Adds new bathroom to the database
 
-Run the tests `npm test`
+GET /api/bathrooms/:bathroom_id : GEts all the information about a specific bathroom including average ratings and number of favorites 
 
-## Deploying
+DELETE /api/bathrooms/:bathroom_id (protected endpoint) : Deletes Bathroom
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+GET /api/bathrooms/:bathroom_id/rates : Gets all the rates for a bathroom
+
+GET /api/bathrooms/:bathroom_id/comments : Gets all the comments for a bathroom
+
+
+
+### Users (Protected Endpoints)
+POST api/users : Creates a New User
+
+GET api/users : Gets a User's information 
+
+DELETE api/users/:userId : Deletes a User
+
+GET api/ users/:userId/rates : gets all of the rates from a user
+
+### Rates 
+
+GET api/rates : Gets all rates
+
+POST api/rates (protected endpoint) : Add new rating
+
+DELETE api/rates/:rate_id : Delete a rating
+
+PATCH api/rates/:rate_id : Edit a rating
+
+
+### Comments (Protected Endpoint)
+
+POST api/comments : Add a new comment
+
