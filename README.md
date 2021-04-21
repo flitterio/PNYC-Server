@@ -93,9 +93,7 @@ Live Version: https://pnyc-client-flitterio.vercel.app/
         "gender_neutral": false,
         "hasbaby_table": false,
         "rate": 0
-    },
-    
-   ...
+    }
    
   ]
 ```
@@ -109,8 +107,8 @@ Live Version: https://pnyc-client-flitterio.vercel.app/
 {
     "id": "[hashid converted on front end from lat]",
     "br_name": "[name of bathroom]",
-    "lat": [valid latitude],
-    "lng": [valid longitude],
+    "lat": [latitude],
+    "lng": [longitude],
     "description": "[Optional description of bathroom, default is 'Bathroom']",
     "user_id": [user id],
     "category": "['preloaded' or 'user_added']",
@@ -120,7 +118,7 @@ Live Version: https://pnyc-client-flitterio.vercel.app/
     "isprivate": [false],
     "gender_neutral": [ false],
     "hasbaby_table": [false],
-    "rate": [average of ratings for this bathroom, default is 0]
+    "rate": [average ratings for bathroom]
 }
 ```
 
